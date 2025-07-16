@@ -1,0 +1,7 @@
+{
+    "deploy": [ "deploy/**" ],
+    "base": "deploy",
+    "isShowCase": true,
+    "appName": "jsonandxml-to-diagram-visualizer"
+}
+  

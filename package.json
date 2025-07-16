@@ -1,0 +1,16 @@
+{
+	"name": "ej2-aspnetcore-jsonandxml-to-diagram-visualizer",
+	"version": "1.0.0",
+	"description": "Essential JS2 ASP.Net core - JSON and XML to Diagram Layout",
+	"author": "Syncfusion Inc.",
+	"license": "SEE LICENSE IN license",
+	"keywords": [
+		"aspnetcore-jsonandxml-to-diagram-visualizer",
+		"ej2-aspnetcore-jsonandxml-to-diagram-visualizer",
+		"core-jsonandxml-to-diagram-visualizer"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/essential-studio/ej2-aspnetcore-jsonandxml-to-diagram-visualizer.git"
+	}
+}

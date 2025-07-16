@@ -1,0 +1,175 @@
+﻿@{
+    ViewData["Title"] = "Essential JS2 for ASP.NET Core - JSON and XML to Diagram Layout";
+}
+
+<div class="app-layout">
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="navbar-left">
+            <img src="/assets/logo.svg" alt="Logo" class="nav-logo" />
+            <span class="nav-title">JSON To Diagram</span>
+
+            <!-- File Operations Dropdown -->
+            <ejs-dropdownbutton id="fileMenuButton" content="File"
+                                items="ViewBag.fileMenuItems" select="handleFileMenuClick">
+            </ejs-dropdownbutton>
+
+            <!-- View Options Dropdown -->
+            <ejs-dropdownbutton id="viewMenuButton" content="View"
+                                items="ViewBag.viewMenuItems" select="handleViewMenuClick">
+            </ejs-dropdownbutton>
+
+            <!-- Theme Selector Dropdown -->
+            <ejs-dropdownbutton id="themeMenuButton" content="Theme"
+                                items="ViewBag.themeOptions" select="handleThemeMenuClick">
+            </ejs-dropdownbutton>
+        </div>
+
+        <div class="navbar-right">
+            <!-- Editor Type Switcher -->
+            <ejs-dropdownlist id="editorTypeSelector" width="90px" dataSource="ViewBag.editorTypes"
+                              index=0 change="handleEditorTypeChange">
+                <e-dropdownlist-fields text="text" value="value"></e-dropdownlist-fields>
+            </ejs-dropdownlist>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+        <!-- Left Panel - Monaco Editor -->
+        <div class="left-panel">
+            <div id="monaco-editor" class="editor-container"></div>
+        </div>
+
+        <!-- Splitter -->
+        <div class="splitter"></div>
+
+        <!-- Right Panel - Diagram and Controls -->
+        <div class="right-panel scroll-hide">
+            <!-- Hamburger Menu -->
+            <ejs-dropdownbutton id="hamburger-menu" cssClass="e-caret-hide" iconCss="e-icons e-menu"
+                                items="ViewBag.hamburgerMenuItems" select="handleHamburgerMenuClick">
+            </ejs-dropdownbutton>
+            <!-- Diagram Container -->
+            <ejs-diagram id="diagram" width="100%" height="100%" backgroundColor="#F8F9FA"
+                            getNodeDefaults="@ViewBag.getNodeDefaults" getConnectorDefaults="@ViewBag.getConnectorDefaults"
+                         click="handleDiagramClick">
+                <e-diagram-layout type="HierarchicalTree" orientation="LeftToRight" connectionPointOrigin="DifferentPoint"
+                                    horizontalSpacing="30" verticalSpacing="100" enableAnimation="false">
+                </e-diagram-layout>
+                <e-diagram-snapsettings constraints="ShowLines">
+                    <e-snapsettings-horizontalgridlines lineColor="#EBE8E8"></e-snapsettings-horizontalgridlines>
+                    <e-snapsettings-verticalgridlines lineColor="#EBE8E8"></e-snapsettings-verticalgridlines>
+                </e-diagram-snapsettings>
+                <e-diagram-scrollsettings scrollLimit="Infinity"></e-diagram-scrollsettings>
+            </ejs-diagram>
+    
+
+            <!-- Toolbar Container -->
+            <div id="toolbar-container">
+                <ejs-toolbar id="toolbar" overflowMode="Extended" items="ViewBag.toolbarItems"
+                             clicked="handleToolbarClick">
+                </ejs-toolbar>
+
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <ejs-textbox id="toolbar-search" placeholder="Search Node" input="handleSearchInput">
+                    </ejs-textbox>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="spinner-container" class="e-spinner-overlay">
+                <div id="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Status Bar -->
+    <div class="bottom-bar">
+        <div class="bottom-bar-content">
+            <!-- Validation Status -->
+            <span class="status-message">
+                <div class="valid-status">
+                    <span class="e-icons e-check"></span>
+                    <span></span>
+                </div>
+                <div class="invalid-status" style="display: none;">
+                    <span class="e-icons e-close invalid-icon"></span>
+                    <span></span>
+                </div>
+            </span>
+
+            <!-- Node Count -->
+            <span class="node-count">Nodes: 0</span>
+        </div>
+    </div>
+</div>
+
+<!-- Export Dialog -->
+<ejs-dialog id="export-dialog" width="300px" header="Export Options" target=".app-layout"
+            isModal="true" visible="false" showCloseIcon="true" overlayClick="handleExportDialogClose">
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton buttonModel="@ViewBag.exportButton" click="handleExportConfirm"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+    <e-content-template>
+        <div style="margin-top: -20px;">
+            <p>File Name</p>
+            <ejs-textbox id="export-filename" placeholder="Enter file name" value="Diagram">
+            </ejs-textbox>
+        </div>
+        <div style="margin-top: 20px;">
+            <p>Format</p>
+            <div style="display: flex; flex-direction: row; gap: 15px;">
+                <ejs-radiobutton id="export-mode-png" label="PNG" name="exportMode" value="PNG" checked="true">
+                </ejs-radiobutton>
+                <ejs-radiobutton id="export-mode-jpg" label="JPG" name="exportMode" value="JPG">
+                </ejs-radiobutton>
+                <ejs-radiobutton id="export-mode-svg" label="SVG" name="exportMode" value="SVG">
+                </ejs-radiobutton>
+            </div>
+        </div>
+    </e-content-template>
+</ejs-dialog>
+
+<!-- Node Details Dialog -->
+<ejs-dialog id="node-details-dialog" width="400px" header="Node Details" target=".app-layout"
+            isModal="true" visible="false" showCloseIcon="true" overlayClick="handleNodeDetailsOverlayClick" closeOnEscape="true">
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton buttonModel="@ViewBag.closeButton" click="handleNodeDetailsClose"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+    <e-content-template>
+        <div style="font-family:Segoe UI, sans-serif; font-size:14px;">
+            <div style="margin-bottom:15px;">
+                <label style="font-weight:500; display:block; margin-bottom:5px;">Content</label>
+                <div class="dialog-box" style="border-radius:5px; position:relative;">
+                    <div id="ndd-content"></div>
+                    <button id="ndd-copy-content" style="position:absolute; top:5px; right:5px; background:transparent; border:none; cursor:pointer;">
+                        <span class="e-icons e-copy" style="color:#6C757D"></span>
+                    </button>
+                </div>
+            </div>
+            <div>
+                <label style="font-weight:500; display:block; margin-bottom:5px;">JSON Path</label>
+                <div class="dialog-box" style="border-radius:5px; position:relative;">
+                    <div id="ndd-path"></div>
+                    <button id="ndd-copy-path" style="position:absolute; top:5px; right:5px; background:transparent; border:none; cursor:pointer;">
+                        <span class="e-icons e-copy" style="color:#6C757D"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+</ejs-dialog>
+
+<!-- File Upload Input (Hidden) -->
+<input type="file" id="file-input" style="display: none;" accept=".json,.xml" />
+
+<script>
+  
+    // Initialize on document ready
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeJsonXmlVisualizer();
+    });
+
+</script>
